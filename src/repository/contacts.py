@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from sqlalchemy import select, extract
+from sqlalchemy import select, extract, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.models import Contact
@@ -56,7 +56,8 @@ async def remove_contact(contact_id: int, db: AsyncSession):
 
 async def get_by_field(contact_value: str, db: AsyncSession):
     sq = select(Contact).filter(
-        (Contact.name == contact_value) | (Contact.surname == contact_value) | (Contact.email == contact_value)
+        (func.lower(Contact.name) == contact_value.lower()) | (func.lower(Contact.surname) == contact_value.lower()) | (
+                    Contact.email == contact_value)
     )
     contact = await db.execute(sq)
     return contact.scalars()
