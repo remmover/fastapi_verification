@@ -1,5 +1,27 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from datetime import date
+
+
+class UserSchema(BaseModel):
+    username: str = Field(min_length=5, max_length=16)
+    email: EmailStr
+    password: str = Field(min_length=6, max_length=10)
+
+
+class UserResponseSchema(BaseModel):
+    id: int
+    username: str
+    email: str
+    avatar: str
+
+    class Config:
+        from_attributes = True
+
+
+class TokenModel(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
 
 
 class ContactSchema(BaseModel):
@@ -11,8 +33,9 @@ class ContactSchema(BaseModel):
     additional_data: str | None = Field(max_length=300)
 
 
-class ContactResponse(ContactSchema):
-    id: int
+class ContactResponseSchema(ContactSchema):
+    id: int = 1
+    user: UserResponseSchema | None
 
     class Config:
         from_attributes = True
