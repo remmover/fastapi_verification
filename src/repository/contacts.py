@@ -63,6 +63,16 @@ async def remove_contact(contact_id: int, user: User, db: AsyncSession):
     return contact
 
 
+async def get_existing_contact(
+    body: ContactSchema,
+    user: User,
+    db: AsyncSession,
+):
+    sq = select(Contact).filter_by(email=body.email, number=body.number, user=user)
+    contact = await db.execute(sq)
+    return contact.scalar_one_or_none()
+
+
 async def get_by_field(contact_value: str, user: User, db: AsyncSession):
     sq = (
         select(Contact)

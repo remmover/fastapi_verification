@@ -47,6 +47,12 @@ async def create_contact(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(auth_service.get_current_user),
 ):
+    existing_contact = await repository_contacts.get_existing_contact(body, user, db)
+    if existing_contact:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Contact with this number or email already exists",
+        )
     contact = await repository_contacts.create_contact(body, user, db)
     return contact
 
