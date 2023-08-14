@@ -5,7 +5,7 @@
     <option name="enabledOnSave" value="true" />
     <option name="executionMode" value="BINARY" />
     <option name="pathToExecutable" value="C:\Users\Gyrocopter_UA\AppData\Local\Programs\Python\Python311\Scripts\black.exe" />
-    <option name="sdkUUID" value="97687116-2a3c-45c1-b308-394b28b23f34" />
+    <option name="sdkUUID" value="859d59d1-a111-4b52-9872-6053a9811d4d" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Poetry (fastapi_verification)" project-jdk-type="Python SDK" />
 </project>
