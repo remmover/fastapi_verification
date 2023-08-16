@@ -1,6 +1,8 @@
+import pickle
 from typing import Optional
 
-from jose import JWTError, jwt
+import redis
+from jose import JWTError, jwt  # noqa
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
@@ -9,13 +11,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.db import get_db
 from src.repository import users as repository_users
+from src.conf.config import config
+from src.conf import messages
 
 
 class Auth:
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    SECRET_KEY = "e8da885ed0699c5f41b0bea1d306892a4c8b09cb7c24bc8291ec897a69ac9c33"
-    ALGORITHM = "HS256"
+    SECRET_KEY = config.secret_key
+    ALGORITHM = config.algorithm
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+    cache = redis.Redis(host=config.redis_host, port=config.redis_port, db=0)
 
     def verify_password(self, plain_password, hashed_password):
         return self.pwd_context.verify(plain_password, hashed_password)
@@ -71,7 +76,7 @@ class Auth:
             print(e)
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Invalid token for email verification",
+                detail=messages.INVALID_SCOPE_TOKEN,
             )
 
     async def decode_refresh_token(self, refresh_token: str):
@@ -84,12 +89,12 @@ class Auth:
                 return email
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid scope for token",
+                detail=messages.INVALID_SCOPE_TOKEN,
             )
         except JWTError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate credentials",
+                detail=messages.VALIDATE_CREDENTIALS,
             )
 
     async def get_current_user(
@@ -97,7 +102,7 @@ class Auth:
     ):
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail=messages.VALIDATE_CREDENTIALS,
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -112,9 +117,15 @@ class Auth:
         except JWTError as e:
             raise credentials_exception
 
-        user = await repository_users.get_user_by_email(email, db)
+        user = self.cache.get(f"user:{email}")
         if user is None:
-            raise credentials_exception
+            user = await repository_users.get_user_by_email(email, db)
+            if user is None:
+                raise credentials_exception
+            self.cache.set(f"user:{email}", pickle.dumps(user))  # noqa
+            self.cache.expire(f"user:{email}", 900)  # noqa
+        else:
+            user = pickle.loads(user)
         return user
 
 

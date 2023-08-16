@@ -2,10 +2,9 @@
 <project version="4">
   <component name="Black">
     <option name="enabledOnReformat" value="true" />
-    <option name="enabledOnSave" value="true" />
     <option name="executionMode" value="BINARY" />
     <option name="pathToExecutable" value="C:\Users\Gyrocopter_UA\AppData\Local\Programs\Python\Python311\Scripts\black.exe" />
-    <option name="sdkUUID" value="859d59d1-a111-4b52-9872-6053a9811d4d" />
+    <option name="sdkUUID" value="34b2371c-ede2-480b-93d3-26989e5b3787" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Poetry (fastapi_verification)" project-jdk-type="Python SDK" />
 </project>

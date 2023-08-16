@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
@@ -5,13 +6,14 @@ from fastapi_mail.errors import ConnectionErrors
 from pydantic import EmailStr
 
 from src.services.auth import auth_service
+from src.conf.config import config
 
 conf = ConnectionConfig(
-    MAIL_USERNAME="remover@meta.ua",
-    MAIL_PASSWORD="",
-    MAIL_FROM="remover@meta.ua",
-    MAIL_PORT=465,
-    MAIL_SERVER="smtp.meta.ua",
+    MAIL_USERNAME=config.mail_username,
+    MAIL_PASSWORD=config.mail_password,
+    MAIL_FROM=config.mail_from,
+    MAIL_PORT=config.mail_port,
+    MAIL_SERVER=config.mail_server,
     MAIL_FROM_NAME="Desired Name",
     MAIL_STARTTLS=False,
     MAIL_SSL_TLS=True,
@@ -38,4 +40,6 @@ async def send_email(email: EmailStr, username: str, host: str):
         fm = FastMail(conf)
         await fm.send_message(message, template_name="email_template.html")
     except ConnectionErrors as err:
-        print(err)
+        logging.error(err)
+
+

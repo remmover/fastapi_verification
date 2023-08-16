@@ -19,7 +19,7 @@ class Contact(Base):
     number: Mapped[str] = mapped_column(String(150), index=True, unique=True)
     bd_date: Mapped[date] = mapped_column(index=True)
     additional_data: Mapped[str] = mapped_column(String(255))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     user: Mapped["User"] = relationship("User", backref="todos", lazy="joined")
 
 
