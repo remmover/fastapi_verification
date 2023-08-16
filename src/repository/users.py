@@ -1,9 +1,11 @@
 import logging
 
+from fastapi import HTTPException, status
 from libgravatar import Gravatar
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.conf import messages
 from src.database.models import User
 from src.schemas import UserSchema
 
@@ -46,3 +48,10 @@ async def update_avatar(email, url: str, db: AsyncSession) -> User:
     user.avatar = url
     await db.commit()
     return user
+
+
+async def update_user_password(
+    user: User, hashed_password: str, db: AsyncSession
+) -> None:
+    user.password = hashed_password
+    await db.commit()

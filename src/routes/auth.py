@@ -1,5 +1,3 @@
-from typing import List
-
 from fastapi import (
     APIRouter,
     HTTPException,
@@ -102,20 +100,6 @@ async def refresh_token(
     }
 
 
-@router.get("/confirmed_email/{token}")
-async def confirmed_email(token: str, db: AsyncSession = Depends(get_db)):
-    email = await auth_service.get_email_from_token(token)
-    user = await repository_users.get_user_by_email(email, db)
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=messages.VERIFICATION_ERROR
-        )
-    if user.confirmed:
-        return {"message": messages.EMAIL_ALREADY_CONFIRMED}
-    await repository_users.confirmed_email(email, db)
-    return {"message": messages.EMAIL_CONFIRMED}
-
-
 @router.post("/request_email")
 async def request_email(
     body: RequestEmail,
@@ -132,3 +116,17 @@ async def request_email(
             send_email, user.email, user.username, request.base_url
         )
     return {"message": messages.CHECK_EMAIL_CONFIRMED}
+
+
+@router.get("/confirmed_email/{token}")
+async def confirmed_email(token: str, db: AsyncSession = Depends(get_db)):
+    email = await auth_service.get_email_from_token(token)
+    user = await repository_users.get_user_by_email(email, db)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=messages.VERIFICATION_ERROR
+        )
+    if user.confirmed:
+        return {"message": messages.EMAIL_ALREADY_CONFIRMED}
+    await repository_users.confirmed_email(email, db)
+    return {"message": messages.EMAIL_CONFIRMED}
