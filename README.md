@@ -23,7 +23,7 @@ Before running the API, make sure you have the following installed:
 1. Clone this repository to your local machine.
 
 ```bash
-git clone https://github.com/remmover/fastapi_app.git
+git clone https://github.com/remmover/fastapi_verification.git
 cd contact-book-web-api
 ```
 
